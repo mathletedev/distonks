@@ -9,6 +9,9 @@ import Util from "./utils/util";
 export default class Bot extends Client {
 	public cmds: Command[] = [];
 	public util = new Util(this);
+	public categories = readdirSync(join(__dirname, "commands")).filter(
+		(cat) => !cat.endsWith(".js")
+	);
 
 	public constructor(options?: ClientOptions) {
 		super(options);

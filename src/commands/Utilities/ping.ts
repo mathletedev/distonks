@@ -7,7 +7,11 @@ export default new Command(
 		name: "ping",
 		description: "See the latency of the bot!"
 	},
-	[],
+	{
+		perms: [],
+		category: "Utilities",
+		examples: ["/ping"]
+	},
 	async ({ bot, interaction }) => {
 		const sent = SnowflakeUtil.deconstruct(interaction.id).timestamp;
 
@@ -16,11 +20,11 @@ export default new Command(
 
 		await bot.util.editMessage(interaction, {
 			title: "🏓 Pong!",
-			description: stripIndents`❯ 💓 ${
-				new Date(ping.timestamp).getTime() - sent
-			}ms
+			description: stripIndents`
+				❯ 💓 ${new Date(ping.timestamp).getTime() - sent}ms
 
-			❯ ⌛ ${bot.ws.ping}ms`
+				❯ ⌛ ${bot.ws.ping}ms
+			`
 		});
 	}
 );

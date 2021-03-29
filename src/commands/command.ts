@@ -7,6 +7,12 @@ import {
 import { PermissionString } from "discord.js";
 import Bot from "../bot";
 
+interface CommandDetails {
+	perms: PermissionString[];
+	category: string;
+	examples: string[];
+}
+
 interface CommandExecutionArgs {
 	bot: Bot;
 	interaction: APIInteraction;
@@ -17,16 +23,16 @@ type CommandExecutionType = (args: CommandExecutionArgs) => Promise<any>;
 
 export default class Command {
 	public props: RESTPostAPIApplicationCommandsJSONBody;
-	public perms: PermissionString[];
+	public details: CommandDetails;
 	private _exec: CommandExecutionType;
 
 	public constructor(
 		props: RESTPostAPIApplicationCommandsJSONBody,
-		perms: PermissionString[],
+		details: CommandDetails,
 		exec: CommandExecutionType
 	) {
 		this.props = props;
-		this.perms = perms;
+		this.details = details;
 		this._exec = exec;
 	}
 
@@ -35,7 +41,7 @@ export default class Command {
 		interaction: APIInteraction,
 		args?: APIApplicationCommandInteractionDataOption[]
 	) {
-		for (const perm of this.perms) {
+		for (const perm of this.details.perms) {
 			if (
 				(BigInt(interaction.member.permissions) & PermissionFlagsBits[perm]) !==
 				PermissionFlagsBits[perm]
@@ -58,11 +64,12 @@ export default class Command {
 		}
 
 		this._exec({ bot, interaction, args: parsedArgs }).catch((err) => {
+			console.log(err);
 			try {
 				if (typeof err !== "string") return bot.util.sendError(interaction);
 				bot.util.sendError(interaction, err);
-			} catch (err) {
-				console.log(err);
+			} catch (error) {
+				console.log(error);
 			}
 		});
 	}

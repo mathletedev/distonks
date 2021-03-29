@@ -14,7 +14,11 @@ export default new Command(
 			}
 		]
 	},
-	["MANAGE_MESSAGES"],
+	{
+		perms: ["MANAGE_MESSAGES"],
+		category: "Utilities",
+		examples: ["/purge 20"]
+	},
 	async ({ bot, interaction, args }) => {
 		const amount = args.amount as number;
 		if (amount < 1 || amount > 100) throw "Amount must be between 1 and 100";
