@@ -17,18 +17,17 @@ export default new Command(
 	["MANAGE_MESSAGES"],
 	async ({ bot, interaction, args }) => {
 		const amount = args.amount as number;
-		if (amount < 1 || amount > 99) throw "Amount must be between 1 and 99";
-
+		if (amount < 1 || amount > 100) throw "Amount must be between 1 and 100";
 		const channel = bot.channels.cache.get(
 			interaction.channel_id
 		) as TextChannel;
 		try {
-			await channel.bulkDelete(amount + 1);
+			await channel.bulkDelete(amount);
 		} catch {
 			throw "Cannot delete messages over 14 days old";
 		}
 
-		bot.util.sendMessage(interaction, {
+		await bot.util.sendMessage(interaction, {
 			type: 3,
 			data: {
 				flags: 64,

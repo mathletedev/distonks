@@ -58,8 +58,12 @@ export default class Command {
 		}
 
 		this._exec({ bot, interaction, args: parsedArgs }).catch((err) => {
-			if (typeof err !== "string") return bot.util.sendError(interaction);
-			bot.util.sendError(interaction, err);
+			try {
+				if (typeof err !== "string") return bot.util.sendError(interaction);
+				bot.util.sendError(interaction, err);
+			} catch (err) {
+				console.log(err);
+			}
 		});
 	}
 }

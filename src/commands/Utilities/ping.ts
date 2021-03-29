@@ -14,14 +14,13 @@ export default new Command(
 		await bot.util.sendMessage(interaction, "Ping?");
 		const ping = await bot.util.getMessage(interaction);
 
-		bot.util.editMessage(interaction, {
+		await bot.util.editMessage(interaction, {
 			title: "🏓 Pong!",
 			description: stripIndents`❯ 💓 ${
 				new Date(ping.timestamp).getTime() - sent
 			}ms
 
-			❯ ⌛ ${bot.ws.ping}ms`,
-			color: bot.util.color("blue")
+			❯ ⌛ ${bot.ws.ping}ms`
 		});
 	}
 );

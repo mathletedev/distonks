@@ -1,5 +1,6 @@
 import {
 	APIEmbed,
+	APIEmbedFooter,
 	APIInteraction,
 	APIInteractionResponse,
 	APIMessage
@@ -25,7 +26,7 @@ export default class Util {
 		interaction: APIInteraction,
 		message: APIInteractionResponse | string | APIEmbed
 	) {
-		const data = this.toResponse(message);
+		const data = this.toResponse(message, interaction);
 
 		// @ts-expect-error
 		await this.bot.api
@@ -34,29 +35,33 @@ export default class Util {
 			.callback.post({ data });
 	}
 
-	public getMessage(interaction: APIInteraction): APIMessage {
-		return (
+	public async getMessage(interaction: APIInteraction): Promise<APIMessage> {
+		// @ts-expect-error
+		return await this.bot.api
 			// @ts-expect-error
-			this.bot.api
-				// @ts-expect-error
-				.webhooks(this.bot.user?.id, interaction.token)
-				.messages("@original")
-				.patch({ data: {} })
-		);
+			.webhooks(this.bot.user?.id, interaction.token)
+			.messages("@original")
+			.patch({ data: {} });
 	}
 
-	public editMessage(interaction: APIInteraction, message: string | APIEmbed) {
-		const { data } = this.toResponse(message);
+	public async editMessage(
+		interaction: APIInteraction,
+		message: string | APIEmbed
+	) {
+		const { data } = this.toResponse(message, interaction);
 
 		// @ts-expect-error
-		this.bot.api
+		await this.bot.api
 			// @ts-expect-error
 			.webhooks(this.bot.user?.id, interaction.token)
 			.messages("@original")
 			.patch({ data });
 	}
 
-	public toResponse(data: APIInteractionResponse | string | APIEmbed) {
+	public toResponse(
+		data: APIInteractionResponse | string | APIEmbed,
+		interaction: APIInteraction
+	) {
 		let tmp: APIInteractionResponse;
 
 		if (typeof data === "string")
@@ -67,29 +72,34 @@ export default class Util {
 				}
 			};
 		else if ("type" in data) tmp = data as APIInteractionResponse;
-		else
+		else {
+			if (!data.color) data.color = this.color("blue");
+			if (!data.footer) data.footer = this.footer(interaction);
+			if (!data.timestamp) data.timestamp = new Date().toISOString();
 			tmp = {
 				type: 4,
 				data: {
+					content: "",
 					embeds: [data]
 				}
 			};
+		}
 
 		return tmp;
 	}
 
-	public color(name: string) {
+	public color(name: "blue") {
 		switch (name) {
 			case "blue":
 				return 0x429bf5;
 		}
 	}
 
-	public sendError(
+	public async sendError(
 		interaction: APIInteraction,
 		error: string = "Command execution failed"
 	) {
-		this.sendMessage(interaction, {
+		await this.sendMessage(interaction, {
 			type: 3,
 			data: {
 				flags: 64,
@@ -103,5 +113,14 @@ export default class Util {
 			.split("_")
 			.map((word) => word[0] + word.slice(1).toLowerCase())
 			.join(" ");
+	}
+
+	public footer(interaction: APIInteraction): APIEmbedFooter {
+		return {
+			text: interaction.member.nick ?? interaction.member.user.username,
+			icon_url: interaction.member.user.avatar
+				? `https://cdn.discordapp.com/${interaction.member.user.avatar}.png`
+				: undefined
+		};
 	}
 }

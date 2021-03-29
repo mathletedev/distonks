@@ -1,5 +1,5 @@
 import { APIInteraction } from "discord-api-types";
-import { Client, ClientOptions } from "discord.js";
+import { ActivityOptions, Client, ClientOptions } from "discord.js";
 import "dotenv-safe/config";
 import { readdirSync } from "fs";
 import { join } from "path";
@@ -24,10 +24,28 @@ export default class Bot extends Client {
 	}
 
 	private setStatus() {
-		this.user?.setActivity({
-			name: "the stock market!",
-			type: "COMPETING"
-		});
+		let status = 1;
+
+		setInterval(() => {
+			let activity: ActivityOptions = {
+				name: "stonks!",
+				type: "COMPETING"
+			};
+			if (status === 2)
+				activity = {
+					name: "/help !",
+					type: "PLAYING"
+				};
+			else if (status === 3)
+				activity = {
+					name: `${this.guilds.cache.size} servers!`,
+					type: "WATCHING"
+				};
+
+			this.user?.setActivity(activity);
+
+			status = status === 3 ? 1 : status + 1;
+		}, 5000);
 	}
 
 	private loadCommands() {
