@@ -8,7 +8,7 @@ export default new Command(
 		description: "See the latency of the bot!"
 	},
 	{
-		perms: [],
+		perms: ["SEND_MESSAGES", "EMBED_LINKS"],
 		category: "Utilities",
 		examples: ["/ping"]
 	},

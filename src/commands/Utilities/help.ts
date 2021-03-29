@@ -14,7 +14,7 @@ export default new Command(
 		]
 	},
 	{
-		perms: [],
+		perms: ["SEND_MESSAGES", "EMBED_LINKS"],
 		category: "Utilities",
 		examples: ["/help", "/help ping"]
 	},
@@ -41,10 +41,11 @@ export default new Command(
           ❯ **Description:** ${command.props.description}
           ❯ **Usage:** \`${usage}\`
           ❯ **Category:** ${command.details.category}
-          ❯ **Permissions:** ${
+          ❯ **Permissions:**\n${
 						command.details.perms.length
 							? command.details.perms
 									.map((perm) => `\`${bot.util.parsePerm(perm)}\``)
+									.sort()
 									.join(" ")
 							: "None"
 					}
