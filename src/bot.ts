@@ -1,11 +1,14 @@
 import { APIInteraction } from "discord-api-types";
 import { Client, ClientOptions } from "discord.js";
+import "dotenv-safe/config";
 import { readdirSync } from "fs";
 import { join } from "path";
 import Command from "./commands/command";
+import Util from "./utils/util";
 
 export default class Bot extends Client {
 	public cmds: Command[] = [];
+	public util = new Util(this);
 
 	public constructor(options?: ClientOptions) {
 		super(options);
@@ -39,7 +42,7 @@ export default class Bot extends Client {
 				this.api
 					// @ts-expect-error
 					.applications(this.user.id)
-					.guilds("745442810022592702")
+					.guilds(process.env.DEV_GUILD)
 					.commands.post({
 						data: command.props
 					});
@@ -47,19 +50,13 @@ export default class Bot extends Client {
 		});
 	}
 
-	private async interactionHandler(interaction: APIInteraction) {
+	private interactionHandler(interaction: APIInteraction) {
 		const name = interaction.data?.name.toLowerCase();
 		const args = interaction.data?.options;
 
 		const command = this.cmds.find((cmd) => cmd.props.name === name);
 		if (!command) return;
 
-		const res = await command.exec(this, interaction, args);
-		if (!res) return;
-
-		// @ts-expect-error
-		this.api.interactions(interaction.id, interaction.token).callback.post({
-			data: res
-		});
+		command.exec(this, interaction, args);
 	}
 }
