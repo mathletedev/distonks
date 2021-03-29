@@ -13,6 +13,14 @@ export default class Util {
 		this.bot = bot;
 	}
 
+	public getApplication(guildID?: string) {
+		// @ts-expect-error
+		let app = this.bot.api.applications(this.bot.user.id);
+		if (guildID) app = app.guilds(guildID);
+
+		return app;
+	}
+
 	public async sendMessage(
 		interaction: APIInteraction,
 		message: APIInteractionResponse | string | APIEmbed

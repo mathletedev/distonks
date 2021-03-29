@@ -10,7 +10,7 @@ import Bot from "../bot";
 interface CommandExecutionArgs {
 	bot: Bot;
 	interaction: APIInteraction;
-	args?: APIApplicationCommandInteractionDataOption[];
+	args: Record<string, any>;
 }
 
 type CommandExecutionType = (args: CommandExecutionArgs) => Promise<any>;
@@ -52,7 +52,12 @@ export default class Command {
 			}
 		}
 
-		this._exec({ bot, interaction, args }).catch((err) => {
+		let parsedArgs: Record<string, any> = {};
+		if (args) {
+			for (const arg of args) parsedArgs[arg.name] = arg.value;
+		}
+
+		this._exec({ bot, interaction, args: parsedArgs }).catch((err) => {
 			if (typeof err !== "string") return bot.util.sendError(interaction);
 			bot.util.sendError(interaction, err);
 		});

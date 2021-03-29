@@ -16,7 +16,7 @@ export default new Command(
 	},
 	["MANAGE_MESSAGES"],
 	async ({ bot, interaction, args }) => {
-		const amount = args![0].value as number;
+		const amount = args.amount as number;
 		if (amount < 1 || amount > 99) throw "Amount must be between 1 and 99";
 
 		const channel = bot.channels.cache.get(

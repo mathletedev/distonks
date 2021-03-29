@@ -38,14 +38,9 @@ export default class Bot extends Client {
 				const command: Command = require(`./commands/${cat}/${file}`).default;
 				this.cmds.push(command);
 
-				// @ts-expect-error
-				this.api
-					// @ts-expect-error
-					.applications(this.user.id)
-					.guilds(process.env.DEV_GUILD)
-					.commands.post({
-						data: command.props
-					});
+				this.util
+					.getApplication(process.env.DEV_GUILD)
+					.commands.post({ data: command.props });
 			});
 		});
 	}
