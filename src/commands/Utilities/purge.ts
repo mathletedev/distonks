@@ -22,20 +22,21 @@ export default new Command(
 	async ({ bot, interaction, args }) => {
 		const amount = args.amount as number;
 		if (amount < 1 || amount > 100) throw "Amount must be between 1 and 100";
+
 		const channel = bot.channels.cache.get(
 			interaction.channel_id
 		) as TextChannel;
-		try {
-			await channel.bulkDelete(amount);
-		} catch {
-			throw "Cannot delete messages over 14 days old";
-		}
+		const deleted = await channel.bulkDelete(amount, true);
+
+		if (deleted.size === 0) throw "No messages to delete";
 
 		await bot.util.sendMessage(interaction, {
 			type: 3,
 			data: {
 				flags: 64,
-				content: `🗑️ Deleted ${amount} message${amount === 1 ? "" : "s"}!`
+				content: `🗑️ Deleted ${deleted.size} message${
+					deleted.size === 1 ? "" : "s"
+				}!`
 			}
 		});
 	}
